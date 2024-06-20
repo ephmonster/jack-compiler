@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "jack-compiler", "jack-compiler.fsproj", "{922C4824-AB64-4A43-8DF0-A70D8BD5C390}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{922C4824-AB64-4A43-8DF0-A70D8BD5C390}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{922C4824-AB64-4A43-8DF0-A70D8BD5C390}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{922C4824-AB64-4A43-8DF0-A70D8BD5C390}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{922C4824-AB64-4A43-8DF0-A70D8BD5C390}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30FC6C30-D215-4E66-A9B5-5D0162163A22}
+	EndGlobalSection
+EndGlobal
