@@ -2,14 +2,17 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>jack_compiler</RootNamespace>
+	<TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="CompilationEngine.fs" />
-    <Compile Include="Tokenizer.fs" />
+    <None Include="Input\Main.jack" />
+    <Compile Include="Tokenization\*.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Output\" />
   </ItemGroup>
 
 </Project>

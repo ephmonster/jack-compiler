@@ -1,37 +1,21 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open System
-open System.IO
+﻿open System.IO
+open Tokenizer
   
-let output = new StreamWriter("C:\\Users\\Ephy's Acer\\Downloads\\nand2tetris\\nand2tetris\\projects\\8\\FunctionCalls\\FibonacciElement\\FibonacciElement.asm")
-let mutable counter = 0
+let INPUT_DIR = Path.Combine(Directory.GetParent(__SOURCE_DIRECTORY__).FullName, "jack-compiler\\Input\\")
+let OUTPUT_DIR = Path.Combine(Directory.GetParent(__SOURCE_DIRECTORY__).FullName, "jack-compiler\\Output\\")
 
-    
-
-let doNothing()=()
-
-let GetFileName(filepath : string) = Path.GetFileNameWithoutExtension(filepath)
-    
+let FileName(filepath : string) = Path.GetFileNameWithoutExtension(filepath)    
 
 [<EntryPoint>]
 let main argv =
-    printfn "Please enter the path: "
-    let path = Console.ReadLine()
-    let files = Directory.GetFiles(path, "*.jack")
-    counter <- 0
+    let files = Directory.GetFiles(INPUT_DIR, "*.jack")
     for file in files do
-        use reader =new StreamReader(file)
-        let className = GetFileName(file)
-        let mutable line = ""
-        while not (reader.EndOfStream) do
-            line <- reader.ReadLine()
-            let words = line.Split([|' '; '\t'|], StringSplitOptions.RemoveEmptyEntries)
-            if words.Length > 0 then
-               
-        let currentFileName = file
-        printf "End of input file: %s\n" currentFileName 
-    output.Flush()
-    output.Close() 
+        use reader = new StreamReader(file)
+        let className = FileName(file)
+        let tokenizer = new Tokenizer(file)
+        tokenizer.Tokenize()
+          
+        printf "End of input file: %s\n" file 
     printf "Output files are ready"
 
     0
