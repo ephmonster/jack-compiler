@@ -30,20 +30,19 @@ let UniaryOps =
 type Tokenizer(filepath: string) = 
     class
         let mutable _tokens = new List<Token>()
-        let _reader = new StreamReader(filepath)
+        let _reader = File.ReadAllText(filepath)
         let mutable _lines = File.ReadAllText(filepath).Split('\n')
         let mutable _curToken: Token = Token("null","null")
         let mutable current_word = ""
+        let mutable position = ref 0
 
         member _.NextChar() =
-            _reader.Read() 
+            let next_char = _reader[position.Value]
+            position += 1
+            next_char
         
-        member _.Skip() =
-            while not _reader.EndOfStream && Char.IsWhiteSpace(char(_reader.Peek())) do
-                _reader.Read() |> ignore
-
         member _.hasMoreTokens() = 
-            not _reader.EndOfStream
+            position.Value < _reader.Length
 
         // member this.Advance() = 
         //     let mutable str = ""
@@ -54,12 +53,13 @@ type Tokenizer(filepath: string) =
         //         ch <- _reader.Read()
         //     _curToken = str
 
+        // Will return a list of tokens 
         member this.Tokenize() = 
             let mutable i = 0
             let mutable lines = ResizeArray<string>()
             while i < _lines.Length do
                 let mutable curLine = Regex.Replace(Regex.Replace(_lines[i].Trim(), @"\/\/.*$", ""), @"\/\*.*?\*\/", "");
-                
+                let mutable x = "a"
                 if String.length(curLine) = 0 || curLine.StartsWith "//" ||
                     curLine.StartsWith "\r" then
                     i <- i + 1
@@ -69,7 +69,7 @@ type Tokenizer(filepath: string) =
                     i <- i + 1
                 else 
                     i <- i + 1
-                    lines.Add curLine
+                    lines.Add(curLine)
 
             let mutable chars = ResizeArray<char>()
             for i in lines.ToArray() do
