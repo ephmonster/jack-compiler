@@ -41,10 +41,9 @@ let isStringConstant(word: string) =
 let isIdentifier(word: string) =
     Regex.IsMatch(word, "^[a-zA-Z_][a-zA-Z0-9_]*$")
 
-
 type Tokenizer(filepath: string) as self = 
     let mutable _tokens = new List<Token>()
-    let mutable _curToken: Token = Token("null","null")
+    let mutable _curToken = Token()
     let mutable _chars: char array = Array.empty  
     let mutable _position = ref -1
     do 
@@ -84,12 +83,45 @@ type Tokenizer(filepath: string) as self =
     member _.hasMoreTokens() = 
         _position.Value + 1 < _chars.Length
 
-    // Also prints the token to console
-    member _.AddToken(token:Token) =
-        _curToken <- token        
-        _tokens.Add(token)
-        printfn "%A" token
-        
+    member _.TokenType() =
+        match _curToken.Type with
+            | "keyword" -> "KEYWORD"
+            | "symbol" -> "SYMBOL"
+            | "identifier" -> "IDENTIFIER"
+            | "integerConstant" -> "INT_CONST"
+            | "stringConstant" -> "STRING_CONST" 
+            | "null" -> "NULL_TYPE"
+
+    member _.Keyword() = 
+        let mutable t = ""
+        if _curToken.Type = "keyword" then
+            t <- _curToken.Lexeme.ToUpper()  
+        t       
+    
+    member _.Symbol() =
+        let mutable t = ""
+        if _curToken.Type = "symbol" then
+            t <- _curToken.Lexeme
+        t 
+
+    member _.Identifier() =
+        let mutable t = ""
+        if _curToken.Type = "identifier" then
+            t <- _curToken.Lexeme
+        t 
+
+    member _.IntVal() =
+        let mutable t = ""
+        if _curToken.Type = "integerConstant" then
+            t <- _curToken.Lexeme
+        t 
+    
+    member _.stringVal() =
+        let mutable t = ""
+        if _curToken.Type = "stringConstant" then
+            t <- _curToken.Lexeme
+        t 
+    
     member this.Advance() = 
         let mutable current_word = ""
         let mutable current_char = this.NextChar()
@@ -148,6 +180,12 @@ type Tokenizer(filepath: string) as self =
             this.Advance()
 
         _tokens
+
+     // Also prints the token to console
+    member _.AddToken(token:Token) =
+        _curToken <- token        
+        _tokens.Add(token)
+        printfn "%A" token
 
 
 
