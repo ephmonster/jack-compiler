@@ -4,8 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="SyntaxAnalyzer\Tokenization\*.fs" />
+    <Compile Include="SyntaxAnalyzer\Compilation\*.fs" />
     <None Include="Input\Main.jack" />
-    <Compile Include="Tokenization\*.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
