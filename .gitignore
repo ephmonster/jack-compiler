@@ -6,22 +6,25 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.props
+*.targets
+*.json
 *.cache
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
 # Build results
-C:/Users/Eden/source/repos/JackCompiler/jack-compiler/obj/
-[Dd]ebug/
+[Oo]bj/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+[Dd]ebug/
 x64/
 x86/
 bld/
 [Bb]in/
-[Oo]bj/
+
 [Ll]og/
 
 # Visual Studio 2015 cache/options directory

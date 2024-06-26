@@ -7,7 +7,7 @@
     <Compile Include="SyntaxAnalyzer\Tokenization\*.fs" />
     <Compile Include="SyntaxAnalyzer\Compilation\*.fs" />
     <None Include="Input\Main.jack" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Compiler.fs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Output\" />
