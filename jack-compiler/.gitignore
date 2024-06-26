@@ -10,8 +10,6 @@
 *.targets
 *.json
 *.cache
-.vscode/launch.json
-jack-compiler/obj/jack-compiler.fsproj.nuget.dgspec.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -263,12 +261,3 @@ paket-files/
 
 # Coverage Report
 MyProject_coverage.xml
-jack-compiler/obj/jack-compiler.fsproj.nuget.dgspec.json
-jack-compiler/obj/jack-compiler.fsproj.nuget.g.props
-jack-compiler/obj/jack-compiler.fsproj.nuget.g.targets
-jack-compiler/obj/project.nuget.cache
-jack-compiler/obj/project.assets.json
-jack-compiler/obj/Debug/netcoreapp3.1/jack-compiler.AssemblyInfoInputs.cache
-jack-compiler/obj/Debug/netcoreapp3.1/jack-compiler.AssemblyInfo.fs
-jack-compiler/obj/Debug/netcoreapp3.1/jack-compiler.fsproj.AssemblyReference.cache
-jack-compiler/obj/Debug/netcoreapp3.1/jack-compiler.fsproj.CoreCompileInputs.cache
