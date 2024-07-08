@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("jack-compiler")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c5d566b4d9a1d74ba8d7c0a3ac8bcfa176f7c1ce")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("jack-compiler")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("jack-compiler")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]

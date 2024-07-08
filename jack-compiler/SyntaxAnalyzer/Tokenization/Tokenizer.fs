@@ -4,10 +4,7 @@ open System.Text.RegularExpressions
 open System
 open System.Collections.Generic
 open Token
-
-let inline (>=<) a (b,c) = a >= b && a <= c
-let inline (+=) a b = a := a.Value + b 
-let inline (-=) a b = a := a.Value - b
+open Globals
 
 let Keywords =
     ["class"; "constructor"; "function"; "method"; "field"; 
@@ -90,8 +87,8 @@ type Tokenizer(filepath: string) as self =
             | "keyword" -> "KEYWORD"
             | "symbol" -> "SYMBOL"
             | "identifier" -> "IDENTIFIER"
-            | "integerConstant" -> "INT_CONST"
-            | "stringConstant" -> "STRING_CONST" 
+            | "integerConstant" -> "INT_CONSTANT"
+            | "stringConstant" -> "STRING_CONSTANT" 
             | "null" -> "NULL_TYPE"
 
     member _.keyword() = 

@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "MR3t99v9elKPI8MKc1rwmvaSzHrzg3BoF09/jm6pDdK8W+Vpl51AaPwTvkql0Uwu12LJcseYfW5DzsChXqP17Q==",
+  "dgSpecHash": "+YiLzHHprVA9c5ZjmP/CMQRHNpqGc3wC07NV6PWRoZ298yQ72ELVwNgk3chybBIVf0eWXu+G3ig7GiQfxA1CSA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\jack-compiler.fsproj",
+  "projectFilePath": "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\jack-compiler.fsproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Ephy's Acer\\.nuget\\packages\\fsharp.core\\5.0.0\\fsharp.core.5.0.0.nupkg.sha512"
+    "C:\\Users\\Eden\\.nuget\\packages\\fsharp.core\\8.0.200\\fsharp.core.8.0.200.nupkg.sha512"
   ],
   "logs": []
 }

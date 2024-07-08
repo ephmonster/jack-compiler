@@ -1,44 +1,55 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\jack-compiler.fsproj": {}
+    "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\jack-compiler.fsproj": {}
   },
   "projects": {
-    "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\jack-compiler.fsproj": {
+    "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\jack-compiler.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\jack-compiler.fsproj",
+        "projectUniqueName": "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\jack-compiler.fsproj",
         "projectName": "jack-compiler",
-        "projectPath": "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\jack-compiler.fsproj",
-        "packagesPath": "C:\\Users\\Ephy's Acer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Ephy's Acer\\jack-compiler\\jack-compiler\\obj\\",
+        "projectPath": "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\jack-compiler.fsproj",
+        "packagesPath": "C:\\Users\\Eden\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Eden\\source\\repos\\JackCompiler\\jack-compiler\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Ephy's Acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Eden\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "netcoreapp3.1"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\8.0.205\\FSharp\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "netcoreapp3.1": {
-            "targetAlias": "netcoreapp3.1",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
-        "netcoreapp3.1": {
-          "targetAlias": "netcoreapp3.1",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "dependencies": {
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[5.0.0, )",
+              "version": "[8.0.200, )",
               "generatePathProperty": true
             }
           },
@@ -48,7 +59,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -57,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
