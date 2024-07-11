@@ -49,42 +49,51 @@
         <subroutineBody>
             <symbol> { </symbol>
             <statements>
-                <returnStatement>
-                    <keyword> return </keyword>
+                <ifStatement>
+                    <keyword> if </keyword>
+                    <symbol> ( </symbol>
                     <expression>
                         <term>
-                            <symbol> ( </symbol>
-                            <expression>
-                                <term>
-                                    <identifier> a </identifier>
-                                </term>
-                                <symbol> + </symbol>
-                                <term>
-                                    <identifier> b </identifier>
-                                </term>
-                            </expression>
-                            <symbol> ) </symbol>
+                            <identifier> y </identifier>
                         </term>
-                        <symbol> - </symbol>
+                        <symbol> &lt; </symbol>
                         <term>
-                            <identifier> commision </identifier>
-                            <symbol> ( </symbol>
-                            <expressionList>
-                                <expression>
-                                    <term>
-                                        <identifier> sum </identifier>
-                                    </term>
-                                    <symbol> * </symbol>
-                                    <term>
-                                        <integerConstant> 5 </integerConstant>
-                                    </term>
-                                </expression>
-                            </expressionList>
-                            <symbol> ) </symbol>
+                            <integerConstant> 3 </integerConstant>
                         </term>
                     </expression>
-                    <symbol> ; </symbol>
-                </returnStatement>
+                    <symbol> ) </symbol>
+                    <symbol> { </symbol>
+                    <statements>
+                        <letStatement>
+                            <keyword> let </keyword>
+                            <identifier> y </identifier>
+                            <symbol> = </symbol>
+                            <expression>
+                                <term>
+                                    <integerConstant> 4 </integerConstant>
+                                </term>
+                            </expression>
+                            <symbol> ; </symbol>
+                        </letStatement>
+                    </statements>
+                    <symbol> } </symbol>
+                    <keyword> else </keyword>
+                    <symbol> { </symbol>
+                    <statements>
+                        <letStatement>
+                            <keyword> let </keyword>
+                            <identifier> y </identifier>
+                            <symbol> = </symbol>
+                            <expression>
+                                <term>
+                                    <integerConstant> 5 </integerConstant>
+                                </term>
+                            </expression>
+                            <symbol> ; </symbol>
+                        </letStatement>
+                    </statements>
+                    <symbol> } </symbol>
+                </ifStatement>
             </statements>
             <symbol> } </symbol>
         </subroutineBody>

@@ -21,6 +21,7 @@ type public SymbolTable(xRoot:XClass) as self =
     let _varIndex = ref 0
     let mutable _nesting = ref 0
     let mutable _indent = ""
+    let mutable _isIndented = false
     let _code = ref []
     let _lcnt = ref 0
     do 
@@ -29,6 +30,7 @@ type public SymbolTable(xRoot:XClass) as self =
         self.PrintClassTable()
 
     member this.ConverToVm() =
+        this.Write($"// {_className}.jack\n")
         for x in _xRoot.Subroutines do
             _curFunction <- x
             this.PrintFuncTable()  
@@ -54,13 +56,19 @@ type public SymbolTable(xRoot:XClass) as self =
         
 
     member _.Write(str:string) =
-        if str.StartsWith("function") || str.StartsWith("label") then 
-            _indent <- ""
-        else 
+        if _isIndented then
             _indent <- "    " 
+        else _indent <- ""
         
         _writer.WriteLine($"{_indent}{str}")
         printfn $"{_indent}{str}"
+
+        if str.StartsWith("function") then
+            _isIndented <- true
+        elif str.StartsWith("return") then
+            _isIndented <- false
+        elif str.Trim() = "" then
+            _isIndented <- false
     
     
     member this.Write(lines:list<string>) =
@@ -90,27 +98,35 @@ type public SymbolTable(xRoot:XClass) as self =
       
         match _curFunction.Type with
         | "method" -> 
+            this.Write "// Method"
             this.Write($"function {_className}.{_curFunction.Name} {!arg_count}")
             this.Write ["push argument 0";
                         "pop pointer 0"]
             this.compileStatements(_curFunction.Body.Statements)
         | "function" -> 
+            this.Write "// Function"
             this.Write($"function {_className}.{_curFunction.Name} {!arg_count}")
             this.compileStatements(_curFunction.Body.Statements)
         | "constructor" ->
+            this.Write "// Constructor"
             this.Write [$"function {_className}.{_curFunction.Name} 0";
+                         "// allocating blocks"
                         $"push constant {this.varCount(Field)}";
                          "call Memory.alloc 1";
                          "pop pointer 0"]
             this.compileStatements(_curFunction.Body.Statements)
+        
+        this.Write ""
             
     
     member this.compileStatements(statements) =
         for s in statements do
             match s.XType with
             | LETSTATEMENT -> // let varName [EXPR]? = EXPR
+                this.Write "// let"
                 // cast
                 let letStatement = s :?> XLetStatement
+
                 // VARNAME
                 let varName = letStatement.VarName
                 // EXPR
@@ -122,6 +138,7 @@ type public SymbolTable(xRoot:XClass) as self =
                 this.Write($"pop {this.kindOf(varName)} {this.indexOf(varName)}")
 
             | DOSTATEMENT -> 
+                this.Write "// do"
                 let doStatement = s :?> XDoStatement
                 // EXP
                 this.compileExpression(doStatement.Expression)
@@ -136,6 +153,7 @@ type public SymbolTable(xRoot:XClass) as self =
                 this.Write "pop temp 0"
                 
             | IFSTATEMENT -> 
+                this.Write "// if"
                 let ifStatement = s :?> XIfStatement
                 let label1, label2 = $"L{!_lcnt+1}", $"L{!_lcnt+2}" 
                 _lcnt += 2
@@ -146,9 +164,10 @@ type public SymbolTable(xRoot:XClass) as self =
                 this.Write $"goto {label2}"
                 this.Write $"label {label1}"
                 this.compileStatements(ifStatement.ElseStatements)
-                this.Write $"lable {label2}"
+                this.Write $"label {label2}"
 
             | WHILESTATEMENT -> 
+                this.Write "// while"
                 let whileStatement = s :?> XWhileStatement
                 let label1, label2 = $"L{!_lcnt+1}", $"L{!_lcnt+2}" 
                 _lcnt += 2
@@ -161,13 +180,14 @@ type public SymbolTable(xRoot:XClass) as self =
                 this.Write $"label {label2}"
                 
             | RETURNSTATEMENT -> 
+                this.Write "// return"
                 let returnStatement = s :?> XReturnStatement
 
                 if returnStatement.RetValue.isNull() then
                     this.Write "push constant 0"
                 else 
                     this.compileExpression(returnStatement.RetValue)
-                this.Write "return\n"
+                this.Write "return"
  
 
     member this.Execute(stack:byref<List<Term>>, operator:Term) =
@@ -175,28 +195,28 @@ type public SymbolTable(xRoot:XClass) as self =
 
         for term in stack do
             match term.TermType with
-            | ExternalPointer -> // push `kind` `index`
+            | EXTERNAL_POINTER -> // push `kind` `index`
                 _code @= $"""push {term.Value.Split(" ")[0]} {term.Value.Split(" ")[1]}"""
-            | MethodPointer ->  
+            | METHOD_POINTER ->  
                 _code @= $"push pointer 0" 
-            | Identifier ->
+            | IDENTIFIER ->
                 _code @= $"push {this.kindOf(term.Value)} {this.indexOf(term.Value)}"
-            | IntegerConstant -> 
+            | INTEGER_CONSTANT -> 
                 _code @= $"push constant {term.Value}"  
-            | StringConstant ->
+            | STRING_CONSTANT ->
                 _code @= $"push string {term.Value}"    // TODO: FIX
-            | Keyword ->
+            | KEYWORD ->
                 if term.Value = "this" then
                     _code @= $"push pointer 0"
                 else _code @= $"push {term.Value}"    
-            | Property ->
+            | PROPERTY ->
                 _code @= $"push {term.Value}"         // TODO: FIX
             | _ -> ()     
 
         let args = operator.Args
         
         match operator.TermType with 
-        | Symbol ->
+        | SYMBOL ->
             match char(operator.Value) with
             | '+' -> _code @= "add"
             | '-' -> _code @= "sub"
@@ -208,149 +228,130 @@ type public SymbolTable(xRoot:XClass) as self =
             | '>' -> _code @= "gt"
             | '=' -> _code @= "eq"
             | _ -> ()   
-        | Unary ->
+        | UNARY ->
             match char(operator.Value) with
             | '~' -> _code @= "not"
             | '-' -> _code @= "neg"
             | _ -> ()   
-        | InternalMethod -> _code @= $"call {_className}.{operator.Value} {args+1}" // Func(..)
-        | ExternalMethod -> _code @= $"call {operator.Value} {args+1}" // Obj.Func(..)
-        | StaticFunction -> _code @= $"call {operator.Value} {args}" // MyClass.Func(..) or OtherClass.Func(..)
-        | Assignment -> ()
+        | INTERNAL_METHOD -> _code @= $"call {_className}.{operator.Value} {args}" // Func(..)
+        | EXTERNAL_METHOD -> _code @= $"call {operator.Value} {args}" // Obj.Func(..)
+        | STATIC_FUNCTION -> _code @= $"call {operator.Value} {args}" // MyClass.Func(..) or OtherClass.Func(..)
+        | ASSIGNMENT -> ()
 
         this.Write(!_code)
         _code := []
         stack.Clear()
 
     member this.compileExpression(exp:XExpression) =
-        let queue = XmlExtensions.Postfix(exp).Tokens()
-
+        let tokens = XmlExtensions.Postfix(exp).Tokens()
         let mutable stack = List<Term>()
-        let mutable args = 0
-
-        for idx in 0..queue.Length - 1 do
-            let term:Term = !queue[idx]
-            match term.TermType with
-            | IntegerConstant | Identifier | Keyword | StringConstant | Property  ->
-                term |> stack.Add
-                if queue.Length = 1 then
-                    this.Execute(&stack, Term(Assignment)) 
-            | Symbol ->
-                let curSymbol = char(term.Value)
+         
+        for i in 0..tokens.Length - 1 do
+            let current:Term = !tokens[i]
+            match current.TermType with
+            | UNARY | INTERNAL_METHOD | EXTERNAL_METHOD | STATIC_FUNCTION -> // Call is now any of these 3
+                this.Execute(&stack, current)
+            | INTEGER_CONSTANT | IDENTIFIER | KEYWORD | STRING_CONSTANT | PROPERTY  ->
+                current |> stack.Add
+                if tokens.Length = 1 then
+                    this.Execute(&stack, Term(ASSIGNMENT)) 
+            | SYMBOL ->
+                let curSymbol = char(current.Value)
                 if BinaryOps.Contains(curSymbol) then
-                    this.Execute(&stack, term)
+                    this.Execute(&stack, current)
                 elif curSymbol = '$' then
                     // Find the future function call
-                    args <- 0
-                    let idj = ref idx
-                    let commas = ref 0
-                    let dollars = ref 0
+                    let args = ref 0
+                    let j = ref i
+                    let start = ref (!j + 1)
+                    let dollars = ref 0 
                     let funcs = ref 0
                     let mutable Break = false
-
-                    let mutable min = 1
-
-                    if (!queue[!idj+1]).TermType = Call then
-                        min <- 0
-                 
-                    while !idj < queue.Length - 1 && not(Break) do
-                        idj += 1
-                        let curr = !queue[!idj]
-                        if curr.Value = "," then
-                            commas += 1
-                        elif curr.Value = "$" then
+                    let mutable first_comma = true
+ 
+                    while !j < tokens.Length - 1 && not(Break) do
+                        j += 1
+                        let lookahead = !tokens[!j]
+                        if lookahead.Value = "," then
+                            if !dollars - !funcs = 0 && first_comma then
+                                args += 2
+                                first_comma <- false
+                            elif !dollars - !funcs = 0 && not(first_comma) then
+                                args += 1  
+                        elif lookahead.Value = "$" then
                             dollars += 1
-                        elif curr.isFunc() && (!funcs + 1) > !dollars then
+                        elif lookahead.isFunc() && (!funcs + 1) > !dollars then
                             Break <- true
-                            args <- (!commas + 1) - (!dollars) + min
-                            let future_call = (!queue[!idj]).Value
+                            // if token is not right after starting '$'
+                            if !j - !start = 0 || !args = 0 then
+                                args := 1
+                            // elif args = 0 then
+                            //     args := 1
+                            let future_call = (!tokens[!j]).Value
                             if not(future_call.Contains(".")) then // Func(x,y)
-                                Term(MethodPointer) |> stack.Add
-                                queue[!idj].Value <- Term(InternalMethod, curr.Value, args)
+                                Term(METHOD_POINTER) |> stack.Add
+                                tokens[!j].Value <- Term(INTERNAL_METHOD, lookahead.Value, !args)
                             else
                                 let obj = future_call.Split(".")[0]
                                 if this.kindOf(obj) <> NONE then // Obj.Func(x,y)
-                                    Term(ExternalPointer, $"{this.kindOf(obj)} {this.indexOf(obj)}") |> stack.Add
-                                    queue[!idj].Value <- Term(ExternalMethod, curr.Value, args)
+                                    Term(EXTERNAL_POINTER, $"{this.kindOf(obj)} {this.indexOf(obj)}") |> stack.Add
+                                    tokens[!j].Value <- Term(EXTERNAL_METHOD, lookahead.Value, !args)
                                 else 
-                                    queue[!idj].Value <- Term(StaticFunction, curr.Value, args)
-                        elif curr.isFunc() then
+                                    tokens[!j].Value <- Term(STATIC_FUNCTION, lookahead.Value, !args)
+                        elif lookahead.isFunc() then
                             funcs += 1
-            | Unary ->          
-                this.Execute(&stack, term)
-            | InternalMethod | ExternalMethod | StaticFunction -> // Call is now any of these 3
-                this.Execute(&stack, term)
 
-    
 
     /// Defines a new identifier of a given ``name``, ``type``, and ``kind`` and assigns it a running
     /// index. ``STATIC`` and ``FIELD`` identifiers have a class scope, while ``ARG`` and ``VAR`` identifiers
     /// have a subroutine scope
     member _.define(name:string, typ:string, kind:string) =
-        let mutable index = 0
-        let mutable symKind = NONE
         match kind with 
-            | "static" ->
-                index <- _staticIndex.Value
-                symKind <- Static
-                _staticIndex += 1
-            | "field" ->
-                index <- _fieldIndex.Value
-                symKind <- Field
-                _fieldIndex += 1
-            | "arg" ->
-                index <- _argIndex.Value
-                symKind <- Arg
-                _argIndex += 1
-            | "local" ->
-                index <- _varIndex.Value
-                symKind <- Local
-                _varIndex += 1
-            | _ -> failwith("error")
+        | "static" ->
+            _classTable[name] <- Symbol(name, typ, Static, _staticIndex.Value)
+            _staticIndex += 1
+        | "field" ->
+            _classTable[name] <- Symbol(name, typ, Field, _fieldIndex.Value)
+            _fieldIndex += 1
+        | "arg" ->
+            _functionTable[name] <- Symbol(name, typ, Arg, _argIndex.Value)
+            _argIndex += 1
+        | "local" ->
+            _functionTable[name] <- Symbol(name, typ, Local, _varIndex.Value)
+            _varIndex += 1
+        | _ -> failwith("error")
 
-        let symbol = Symbol.Symbol(name, typ, symKind, index)
-        match symKind with 
-            | Static | Field -> _classTable[symbol.Name] <- symbol
-            | Arg | Local -> _functionTable[symbol.Name] <- symbol
-            | _ -> failwith("error")
 
     /// Returns the number of variables of the given ``kind`` already defined in the current scope
     member _.varCount(kind:SymbolKind) =
         match kind with
-            | Static -> _staticIndex.Value
-            | Field -> _fieldIndex.Value
-            | Arg -> _argIndex.Value
-            | Local -> _varIndex.Value
-            | _ -> -1
+        | Static -> _staticIndex.Value
+        | Field -> _fieldIndex.Value
+        | Arg -> _argIndex.Value
+        | Local -> _varIndex.Value
+        | NONE -> -1
 
     /// Returns the ``kind`` of the named identifier in the current scope. If the identifier is unknown, returns
     /// ``NONE``
     member _.kindOf(name:string) : SymbolKind =
-        let mutable symbol = Symbol.Symbol()
-        if _classTable.Keys.Contains(name) then
-            symbol <- _classTable[name]
-        elif _functionTable.Keys.Contains(name) then
-            symbol <- _functionTable[name]
-        
-        symbol.Kind
+        if _functionTable.Keys.Contains(name) then
+            _functionTable[name].Kind
+        elif _classTable.Keys.Contains(name) then
+            _classTable[name].Kind
+        else NONE       
     
     /// Returns the ``type`` of the named identifier in the current scope
     member _.typeOf(name:string) : string =
-        let mutable symbol = Symbol.Symbol()
-        if _classTable.Keys.Contains(name) then
-            symbol <- _classTable[name]
-        elif _functionTable.Keys.Contains(name) then
-            symbol <- _functionTable[name]
-        
-        symbol.Type.ToString()
+        if _functionTable.Keys.Contains(name) then
+            _functionTable[name].Type.ToString()
+        elif _classTable.Keys.Contains(name) then
+            _classTable[name].Type.ToString()
+        else "NONE"
     
     /// Returns the ``index`` assigned to the named identifier
     member _.indexOf(name:string) =
-        let mutable symbol = Symbol.Symbol()
-        if _classTable.Keys.Contains(name) then
-            symbol <- _classTable[name]
-        elif _functionTable.Keys.Contains(name) then
-            symbol <- _functionTable[name]
-
-        symbol.Index
-    
+        if _functionTable.Keys.Contains(name) then
+            _functionTable[name].Index
+        elif _classTable.Keys.Contains(name) then
+            _classTable[name].Index
+        else -1    

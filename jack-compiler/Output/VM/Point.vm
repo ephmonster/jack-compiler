@@ -1,0 +1,29 @@
+// Point.jack
+
+// Constructor
+function Point.new 0
+    // allocating blocks
+    push constant 2
+    call Memory.alloc 1
+    pop pointer 0
+    
+// Method
+function Point.distance 2
+    push argument 0
+    pop pointer 0
+    // if
+    push this 1
+    push constant 3
+    lt
+    not
+    if-goto L1
+    // let
+    push constant 4
+    pop this 1
+    goto L2
+    label L1
+    // let
+    push constant 5
+    pop this 1
+    label L2
+    

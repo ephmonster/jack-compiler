@@ -12,13 +12,13 @@ type XmlExtensions() =
 
     member _.PeekTerm() =
         if _index.Value + 1 >= _terms.Count then
-            Term(Error,"")
+            Term(TERM_ERROR,"")
         else _terms[_index.Value + 1]
 
 
     member _.NextTerm() =
         if _index.Value + 1 >= _terms.Count then
-            Term(Error, "")
+            Term(TERM_ERROR, "")
         else 
             _index += 1
             _terms[!_index]
@@ -28,13 +28,13 @@ type XmlExtensions() =
         let rec rtraverse(x:XElement) =
             match x with
                 | :? XSubTerm as xsubterm ->
-                        let mutable termtype = Keyword
+                        let mutable termtype = KEYWORD
                         match xsubterm.Subtype with 
-                        | "integerConstant" -> termtype <- IntegerConstant
-                        | "identifier" -> termtype <- Identifier
-                        | "stringConstant" -> termtype <- StringConstant
-                        | "symbol" -> termtype <- Symbol
-                        | "keyword" -> termtype <- Keyword
+                        | "integerConstant" -> termtype <- INTEGER_CONSTANT
+                        | "identifier" -> termtype <- IDENTIFIER
+                        | "stringConstant" -> termtype <- STRING_CONSTANT
+                        | "symbol" -> termtype <- SYMBOL
+                        | "keyword" -> termtype <- KEYWORD
                         | _ -> failwith("Err")
                         Term(termtype, xsubterm.Value) |> _terms.Add
                 | :? XTerm as xterm ->
@@ -58,12 +58,12 @@ type XmlExtensions() =
             while _index.Value < _terms.Count - 1 do
                 let x = this.NextTerm()
                 match x.TermType with
-                | Identifier ->
+                | IDENTIFIER ->
                     let mutable func_args = 0
                     // PEEK NEXT 
                     match this.PeekTerm().Value with 
                     | "(" -> // CASE: f(E)$
-                        Term(Call, $"{x.Value}") |> mod_terms.Add // FUNC
+                        Term(CALL, $"{x.Value}") |> mod_terms.Add // FUNC
                         this.NextTerm() |> mod_terms.Add // LPARENS
                         modify() // EXPR          
                     | "." -> // CASE: x.f(E)$
@@ -72,17 +72,17 @@ type XmlExtensions() =
                         next <- this.NextTerm()
                         let propName = next.Value             
                         if this.PeekTerm().Value = "(" then
-                            Term(Call, $"{objName}.{propName}") |> mod_terms.Add // FUNC
+                            Term(CALL, $"{objName}.{propName}") |> mod_terms.Add // FUNC
                             this.NextTerm() |> mod_terms.Add // LPARENS
                             modify() // EXPR
                         else // CASE: x.f$
-                            Term(Property, $"{objName}.{propName}") |> mod_terms.Add
+                            Term(PROPERTY, $"{objName}.{propName}") |> mod_terms.Add
                     | _ -> x |> mod_terms.Add // CASE: x $
-                | Symbol ->
+                | SYMBOL ->
                     if x.Value = ")" then
                         x |> mod_terms.Add // RPARENS
                     else x |> mod_terms.Add
-                | Error -> ()
+                | TERM_ERROR -> ()
                 | _ -> x |> mod_terms.Add // CASE: Complement
         
         modify()
@@ -130,7 +130,7 @@ type Postfix(exp:XExpression) as self =
             stack.Count = 0
 
         let operatorOnStack() = 
-            stack.Count > 0 && (stack.Peek().Value |> self.isOperator || stack.Peek().TermType = Call) && stack.Peek().Value <> "("
+            stack.Count > 0 && (stack.Peek().Value |> self.isOperator || stack.Peek().TermType = CALL) && stack.Peek().Value <> "("
 
         let isLast() =
             _index.Value + 1 = _terms.Count
@@ -142,7 +142,7 @@ type Postfix(exp:XExpression) as self =
         while _index.Value < _terms.Count - 1 do
             let mutable curr:Term = self.NextTerm()
             match curr.TermType with
-            | Symbol ->
+            | SYMBOL ->
                 // LPARENS
                 if curr.Value |= ["("; "["] then 
                     curr |> opPush
@@ -167,22 +167,22 @@ type Postfix(exp:XExpression) as self =
                     curr |> result_add
                 elif curr.Value |> self.isOperator then 
                     // OPERATOR
-                    let mutable op = Term(Symbol, curr.Value)
+                    let mutable op = Term(SYMBOL, curr.Value)
                     if !_index = 0 then 
-                        op <- Term(Unary, curr.Value)
+                        op <- Term(UNARY, curr.Value)
                     if operatorOnStack() then 
                          // ANOTHER OPERATOR
-                        if stack.Peek().TermType <> Unary then
-                            op <- Term(Unary, curr.Value)
+                        if stack.Peek().TermType <> UNARY then
+                            op <- Term(UNARY, curr.Value)
                         else opPop() |> result_add
                     op |> opPush
-            | Keyword | IntegerConstant | StringConstant | Property | Identifier ->
+            | KEYWORD | INTEGER_CONSTANT | STRING_CONSTANT | PROPERTY | IDENTIFIER ->
                 curr |> result_add
                 if operatorOnStack() then
                     opPop() |> result_add
-            | Call ->
+            | CALL ->
                 curr |> opPush // FUNCTION
-                Term(Symbol, "$") |> result_add // ARG SYMBOL
+                Term(SYMBOL, "$") |> result_add // ARG SYMBOL
             
             printStack()
             printOutput() 
@@ -190,8 +190,6 @@ type Postfix(exp:XExpression) as self =
                 
         while stack.Count > 0 do
             stack.Pop() |> result_add
-
-        
 
         printfn "REVERSE POLISH:"
         output |> List.iter (fun term -> printf $"{term.Value} " )

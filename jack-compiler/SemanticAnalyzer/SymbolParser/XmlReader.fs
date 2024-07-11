@@ -339,7 +339,13 @@ type TokenParser(filepath:string) =
         this.parseTerm() |> xRoot.Add
         
         while this.TagName() = "symbol" do
-            XSubTerm("symbol", this.TagValue()) |> xRoot.Add
+            let mutable symbol = this.TagValue()
+            match symbol with 
+            | "&lt;" -> symbol <- "<"
+            | "&gt;" -> symbol <- ">"
+            | "&amp;" -> symbol <- "&"
+           
+            XSubTerm("symbol", symbol) |> xRoot.Add
             this.parseTerm() |> xRoot.Add  
                 
         this.SkipPast("/expression")

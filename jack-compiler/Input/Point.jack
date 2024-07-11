@@ -11,10 +11,43 @@ class Point
       //return this; //// required in Jack constructors
    }
 
+         // this<- a0        a1
    method int distance(Point other) {
+      //      l0  l1
       //var int dx, dy;
+       
+      //  push this 0
+      //  push arg 1
+      //  call other.getx 1
+      //  sub
+      //  pop local 0 
       //let dx = x – other.getx();
+      
+      //  push this 1
+      //  push arg 1
+      //  call other.gety 1
+      //  sub 
+      //  pop local 1
       //let dy = y – other.gety();
-      return (a + b) - commision(sum * 5);
+
+      if (y < 3)
+      {
+         let y = 4;
+      }
+      else 
+      {
+         let y = 5;
+      }
+      
+      //  push local 0
+      //  push local 0
+      //  call Math.multiply 2
+      //  push local 1
+      //  push local 1
+      //  call Math.multiply 2
+      //  add
+      //  call Math.sqrt 1
+      //  return
+      //return Math.sqrt((dx*dx) +(dy*dy));
    }
 }

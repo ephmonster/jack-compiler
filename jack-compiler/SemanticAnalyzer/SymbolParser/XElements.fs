@@ -58,7 +58,7 @@ type XClass(name) =
     override x.ToString() =
         $"SubroutineDec({x.Name} Vars: {x.VarDecs.Count} Subs: {x.Subroutines.Count})"
 
-type XSubTerm(subtype,value) =
+type XSubTerm(subtype, value) =
     inherit XElement(SUBTERM)
     member val Subtype:string = subtype with get,set
     member val Value:string = value with get,set
