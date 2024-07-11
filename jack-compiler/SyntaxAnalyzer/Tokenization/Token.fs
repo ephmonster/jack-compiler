@@ -1,4 +1,6 @@
 module Token
+
+
 [<StructuredFormatDisplay("<{Type}>{Lexeme}</{Type}>")>]
 type public Token(typ:string, lex:string) = 
     let xmlTok typ lex = 

@@ -1,0 +1,34 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/11/Pong/Main.jack
+// (Same as projects/9/Pong/Main.jack)
+/**
+ * Main class of the Pong game.
+ */
+class BankAccount {
+    
+    static int nAccounts;      // static 0
+    static int bankCommission; // static 1
+
+    field int id;              // this 0
+    field String owner;        // this 1
+    field int balance;         // this 2
+   
+
+    method int commission(int x) 
+    {
+
+    }
+                      // arg 1    arg 2             arg 3
+    method void transfer(int sum, BankAccount from, Date when)
+    {
+        // local 0 local 1
+        var int i, j; 
+        var Date date; // local 2
+
+        let balance = (balance + sum) - commission(sum * 5);
+
+        return;
+    } 
+}

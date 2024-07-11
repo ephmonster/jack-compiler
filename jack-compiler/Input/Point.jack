@@ -1,0 +1,20 @@
+class Point 
+{
+   field int x, y;
+   static int pointCount;
+ 
+   /** Constructs a new point. */
+   constructor Point new(int ax, int ay) {
+      //let x = ax;
+      //let y = ay;
+      //let pointCount = pointCount + 1;
+      //return this; //// required in Jack constructors
+   }
+
+   method int distance(Point other) {
+      //var int dx, dy;
+      //let dx = x – other.getx();
+      //let dy = y – other.gety();
+      return (a + b) - commision(sum * 5);
+   }
+}

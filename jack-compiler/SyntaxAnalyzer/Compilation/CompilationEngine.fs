@@ -4,8 +4,6 @@ open System.IO
 open Globals
 open CompErrors
 
-let rep(times,text) = 
-    String.replicate times text
 
 type CompilationEngine(inputFile: string, outputFile: string) =
     let _writer = new StreamWriter(outputFile)
@@ -21,19 +19,19 @@ type CompilationEngine(inputFile: string, outputFile: string) =
         if str |= ["<class>"; "<classVarDec>"; "<subroutineDec>"; "<subroutineBody>"; 
             "<subroutineCall>"; "<varDec>"; "<parameterList>"; "<statements>"; 
             "<letStatement>"; "<doStatement>"; "<whileStatement>"; "<ifStatement>"; 
-            "<returnStatement>"; "<expression>"; "<term>"; "<expressionList>" ] then
+            "<returnStatement>"; "<expression>"; "<term>"; "<expressionList>"] then
             indents <- String.replicate _indentLevel.Value " "   
             _indentLevel += 4
         elif str |= ["</class>"; "</classVarDec>"; "</subroutineDec>"; "</subroutineBody>"; 
             "</subroutineCall>"; "</varDec>"; "</parameterList>"; "</statements>"; 
             "</letStatement>"; "</doStatement>"; "</whileStatement>"; "</ifStatement>"; 
-            "</returnStatement>"; "</expression>"; "</term>"; "</expressionList>" ] then
+            "</returnStatement>"; "</expression>"; "</term>"; "</expressionList>"] then
             _indentLevel -= 4
             indents <- String.replicate _indentLevel.Value " "   
         else 
             indents <- String.replicate _indentLevel.Value " " 
         
-        _writer.WriteLine(indents + str)
+        _writer.WriteLine $"{indents + str}"
         printfn $"{indents + str}"
 
     member this.compileClass() =
@@ -42,16 +40,16 @@ type CompilationEngine(inputFile: string, outputFile: string) =
         match _tokenizer.keyword() with
             | "CLASS" -> 
                 this.Write("<keyword> class </keyword>")
-            | _ -> failwith("Incorrect compileClass")
+            | _ -> failwith(CompError(100))
         _tokenizer.advance()
         match _tokenizer.tokenType() with
             | "IDENTIFIER" -> 
                 this.Write($"<identifier> {_tokenizer.identifier()} </identifier>")
-            | _ -> failwith("Incorrect compileClass")
+            | _ -> failwith(CompError(101))
         _tokenizer.advance()
         match _tokenizer.symbol() with
             | "{" -> this.Write("<symbol> { </symbol>")
-            | _ -> failwith("Incorrect compileClass")
+            | _ -> failwith(CompError(2))
         _tokenizer.advance()
         while List.contains (_tokenizer.keyword()) ["STATIC"; "FIELD"] do
             this.Write("<classVarDec>")
@@ -65,7 +63,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
             _tokenizer.advance()
         match _tokenizer.symbol() with
             | "}" -> this.Write("<symbol> } </symbol>")
-            | _ -> failwith("Incorrect compileClass")
+            | _ -> failwith(CompError(3))
         this.Write("</class>")
         _writer.Close()
 
@@ -75,7 +73,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
                 this.Write($"<keyword> static </keyword>")
             | "FIELD" -> 
                 this.Write($"<keyword> field </keyword>")
-            | _ -> failwith("Incorrect ClassVarDec")
+            | _ -> failwith(CompError(102))
         _tokenizer.advance()
         match _tokenizer.tokenType() with
             | "KEYWORD" ->
@@ -159,6 +157,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
         this.compileSubroutineBody()
         this.Write("</subroutineBody>")
         
+
     member this.compileParameterList() = 
         if _tokenizer.keyword() |= ["VOID"; "INT"; "CHAR"; "BOOLEAN"] || _tokenizer.tokenType() = "IDENTIFIER" then
             match _tokenizer.tokenType() with
@@ -170,15 +169,12 @@ type CompilationEngine(inputFile: string, outputFile: string) =
             | "IDENTIFIER" -> 
                 this.Write($"<identifier> {_tokenizer.identifier()} </identifier>")
              
-
             _tokenizer.advance()
             match _tokenizer.tokenType() with
                 | "IDENTIFIER" -> 
                     this.Write($"<identifier> {_tokenizer.identifier()} </identifier>")
                 | _ -> failwith("Incorrect ParamList")
             
-   
-
             _tokenizer.advance()
             while _tokenizer.symbol() = "," do
                 this.Write("<symbol> , </symbol>")
@@ -223,7 +219,6 @@ type CompilationEngine(inputFile: string, outputFile: string) =
             | _ -> failwith("Incorrect subRoutineBody")
         
 
-
     member this.compileVarDec() =
         this.Write("<keyword> var </keyword>")
         _tokenizer.advance()
@@ -265,7 +260,6 @@ type CompilationEngine(inputFile: string, outputFile: string) =
         _tokenizer.advance()
     
 
-
     member this.compileStatements() =
         if List.contains (_tokenizer.keyword()) ["LET"; "IF"; "WHILE"; "DO"; "RETURN"] then
             while List.contains (_tokenizer.keyword()) ["LET"; "IF"; "WHILE"; "DO"; "RETURN"] do
@@ -291,8 +285,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
                         this.compileReturn()
                         this.Write("</returnStatement>")
             // TODO: may need to check for errors?
-        else ()
-        
+
          
     member this.compileLet() =
         this.Write("<keyword> let </keyword>")
@@ -328,7 +321,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
         
         match _tokenizer.symbol() with
             | ";" -> this.Write("<symbol> ; </symbol>")
-            | _ -> failwith()
+            | _ -> failwith(CompError(1))
         
         _tokenizer.advance()
 
@@ -487,8 +480,8 @@ type CompilationEngine(inputFile: string, outputFile: string) =
                             | _ -> failwith("incorrect do")                                
                     | _ -> failwith("Incorrect do")
         else failwith("Incorrect do")
-        
         _tokenizer.advance()
+
 
     member this.compileReturn()=
         this.Write("<keyword> return </keyword>")
@@ -539,6 +532,7 @@ type CompilationEngine(inputFile: string, outputFile: string) =
                 | _ -> 
                     stop <- true
     
+
     member this.compileTerm() =
         let rec termRec() =
             match _tokenizer.tokenType() with
@@ -689,6 +683,3 @@ type CompilationEngine(inputFile: string, outputFile: string) =
                                 | _ -> stop <- true
                     | _ -> ()
         counter
-
-
-

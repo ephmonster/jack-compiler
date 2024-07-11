@@ -5,12 +5,10 @@ open System.Collections.Generic
 
 let XmlWriter(outputDir:string, className:string, tokens:List<Token>) =
     let xmlFile = new StreamWriter(outputDir + $"\\{className}T.xml")
-    xmlFile.WriteLine("<tokens>")
     
+    xmlFile.WriteLine      "<tokens>"
     for token in tokens do
-        xmlFile.Write("\t")
-        xmlFile.WriteLine($"<{token.Type}> {token.Lexeme} </{token.Type}>")
+        xmlFile.WriteLine $"    <{token.Type}> {token.Lexeme} </{token.Type}>"
+    xmlFile.WriteLine      "</tokens>"
     
-    xmlFile.Write("</tokens>")
-    xmlFile.Flush()
     xmlFile.Close()

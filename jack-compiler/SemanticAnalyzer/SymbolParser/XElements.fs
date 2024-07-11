@@ -5,7 +5,7 @@ type XType = | CLASS | CLASSVARDEC | PARAMETER | VARDEC | SUBROUTINEDEC | SUBROU
              | SUBTERM | EXPRESSION | TERM | DOSTATEMENT | IFSTATEMENT | WHILESTATEMENT 
              | LETSTATEMENT | RETURNSTATEMENT
 
-///// CLASSES
+
 type XElement(xtype) =
     member _.XType:XType = xtype
 
@@ -47,6 +47,7 @@ type XSubroutineDec(t,r,n) =
     member val Body = XSubroutineBody() with get,set
     override x.ToString() =
         $"SubroutineDec({x.Type} {x.RetType} {x.Name} n={x.Parameters.Count})"
+    new() = XSubroutineDec("", "", "")
 
 type XClass(name) = 
     inherit XElement(CLASS)
@@ -63,7 +64,7 @@ type XSubTerm(subtype,value) =
     member val Value:string = value with get,set
     new() = XSubTerm("","")
     override x.ToString() =
-        $"SubTerm({x.Subtype} {x.Value})"
+        $"{x.Subtype.ToUpper()}({x.Value})"
 
 type XExpression() =
     inherit XElement(EXPRESSION)
@@ -72,6 +73,9 @@ type XExpression() =
         this.SubElems.Add x
     override x.ToString() =
         $"Expression(Elems: {x.SubElems.Count})"
+    member this.isNull() =
+        this.SubElems.Count = 0
+
 
 type XTerm() =
     inherit XElement(TERM)

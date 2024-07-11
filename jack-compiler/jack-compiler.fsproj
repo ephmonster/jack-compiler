@@ -6,7 +6,7 @@
   <ItemGroup>
     <Compile Include="Globals.fs" /> 
     <Compile Include="SyntaxAnalyzer\Tokenization\*.fs" /> 
-    <Compile Include="SyntaxAnalyzer\Compilation\*.fs">
+    <Compile Include="SyntaxAnalyzer\Compilation\*.fs" />
     <Compile Include="SemanticAnalyzer\SymbolParser\*.fs" />
     <Compile Include="SemanticAnalyzer\Symbolizer\*.fs" />
     <None Include="Input\*.jack" />

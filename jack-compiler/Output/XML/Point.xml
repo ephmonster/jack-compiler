@@ -1,0 +1,93 @@
+<class>
+    <keyword> class </keyword>
+    <identifier> Point </identifier>
+    <symbol> { </symbol>
+    <classVarDec>
+        <keyword> field </keyword>
+        <keyword> int </keyword>
+        <identifier> x </identifier>
+        <symbol> , </symbol>
+        <identifier> y </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> static </keyword>
+        <keyword> int </keyword>
+        <identifier> pointCount </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <subroutineDec>
+        <keyword> constructor </keyword>
+        <identifier> Point </identifier>
+        <identifier> new </identifier>
+        <symbol> ( </symbol>
+        <parameterList>
+            <keyword> INT </keyword>
+            <identifier> ax </identifier>
+            <symbol> , </symbol>
+            <keyword> INT </keyword>
+            <identifier> ay </identifier>
+        </parameterList>
+        <symbol> ) </symbol>
+        <subroutineBody>
+            <symbol> { </symbol>
+            <statements>
+            </statements>
+            <symbol> } </symbol>
+        </subroutineBody>
+    </subroutineDec>
+    <subroutineDec>
+        <keyword> method </keyword>
+        <keyword> int </keyword>
+        <identifier> distance </identifier>
+        <symbol> ( </symbol>
+        <parameterList>
+            <identifier> Point </identifier>
+            <identifier> other </identifier>
+        </parameterList>
+        <symbol> ) </symbol>
+        <subroutineBody>
+            <symbol> { </symbol>
+            <statements>
+                <returnStatement>
+                    <keyword> return </keyword>
+                    <expression>
+                        <term>
+                            <symbol> ( </symbol>
+                            <expression>
+                                <term>
+                                    <identifier> a </identifier>
+                                </term>
+                                <symbol> + </symbol>
+                                <term>
+                                    <identifier> b </identifier>
+                                </term>
+                            </expression>
+                            <symbol> ) </symbol>
+                        </term>
+                        <symbol> - </symbol>
+                        <term>
+                            <identifier> commision </identifier>
+                            <symbol> ( </symbol>
+                            <expressionList>
+                                <expression>
+                                    <term>
+                                        <identifier> sum </identifier>
+                                    </term>
+                                    <symbol> * </symbol>
+                                    <term>
+                                        <integerConstant> 5 </integerConstant>
+                                    </term>
+                                </expression>
+                            </expressionList>
+                            <symbol> ) </symbol>
+                        </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                </returnStatement>
+            </statements>
+            <symbol> } </symbol>
+        </subroutineBody>
+    </subroutineDec>
+    <symbol> } </symbol>
+</class>

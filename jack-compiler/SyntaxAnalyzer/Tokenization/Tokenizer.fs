@@ -6,24 +6,8 @@ open System.Collections.Generic
 open Token
 open Globals
 
-let Keywords =
-    ["class"; "constructor"; "function"; "method"; "field"; 
-     "static"; "var"; "int"; "char"; "boolean"; "void"; "true"; 
-     "false"; "null"; "this"; "let"; "do"; "if"; "else"; 
-     "while"; "return"] |> Set
-
-let Symbols = 
-    ['{'; '}'; '('; ')'; '['; ']'; '.'; ','; ';'; '+'; '-'; 
-     '*'; '/'; '&'; '|'; '<'; '>'; '='; '~'] |> Set
-
-let Ops = 
-    ['+'; '-'; '*'; '/'; '&'; '|'; '<'; '>'; '='] |> Set
-
-let UniaryOps = 
-    ['-'; '~'] |> Set
-
 let isKeyword(word: string) = 
-        Keywords.Contains(word)
+    Keywords.Contains(word)
         
 let isSymbol(word:string) =
     word.Length = 1 && Symbols.Contains(char word)
@@ -174,6 +158,7 @@ type Tokenizer(filepath: string) as self =
                 | '>' -> this.AddToken(Token("symbol", "&gt;"))
                 | '"' -> this.AddToken(Token("symbol", "&quot;"))
                 | '&' -> this.AddToken(Token("symbol", "&amp;")) 
+                | '–' -> this.AddToken(Token("symbol", "-")) // EN DASH (looks like a minus)
                 | _ -> this.AddToken(Token("symbol", $"{current_char}"))
 
         else exit(-1)

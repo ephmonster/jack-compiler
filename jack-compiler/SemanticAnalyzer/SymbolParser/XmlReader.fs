@@ -1,10 +1,10 @@
 module XmlReader
 open XElements
-open System.IO
+open System.IO  
 open System.Collections.Generic
 open Globals
 
-type XmlReader(filepath:string) =
+type TokenParser(filepath:string) =
     let _filepath = filepath
     let _reader = new StreamReader(filepath)
     let mutable _peeker = new StreamReader(filepath)
@@ -19,7 +19,7 @@ type XmlReader(filepath:string) =
     member _.NextLine() =
         _curLine <- _reader.ReadLine().Trim()
         _lineNum += 1
-        printfn $"[read] {_curLine}"
+        printfn $"[current] {_curLine}"
 
     member _.PeekLine() =
         _peekLine <- _peeker.ReadLine().Trim()
@@ -109,9 +109,11 @@ type XmlReader(filepath:string) =
                 else tag <- tag + string _curLine[!i]
         tag
  
-    member this.Deserialize() =
+
+    member this.Parse() =
         this.parseClass() 
     
+
     member this.parseClass() =
         this.SkipTo("identifier")
         let xRoot = XClass(this.TagValue())
@@ -169,7 +171,6 @@ type XmlReader(filepath:string) =
         this.SkipPast("parameterList")
 
         // either <keyword> or </paramterList>
-
         while _curLine <> "</parameterList>" do
             let argType = this.TagValue()
             this.NextLine()
@@ -230,7 +231,8 @@ type XmlReader(filepath:string) =
         this.SkipPast("/statements")
         statements
     
-    /// ``let`` ``varName`` (``[`` ``expression`` ``]``)? ``=`` ``expression`` ``;``
+
+    /// `let` `varName` **(**`[`EXPR`]`**)?** `=` EXPR `;`
     member this.parseLetStatement() =
         this.SkipPast("keyword")
         let xRoot = XLetStatement(this.TagValue()) // <identifier>
@@ -243,34 +245,24 @@ type XmlReader(filepath:string) =
         xRoot.Assigment <- this.parseExpression()
         this.SkipTo("/letStatement")
         this.NextLine()
-        for x:XSubTerm in Xml.Extensions.GetSubterms(xRoot.Assigment) do
-            printfn $"{x.Value}"
         xRoot
 
-    /// ``if`` ``(`` ``expression`` ``)`` ``{`` ``statements`` ``}``  
-    /// ``else`` ``{`` ``statements`` ``}`` 
+
+    /// `if` `(`EXPR`)` `{`STATEMENTS`}` \
+    /// **(**`else` `{`STATEMENTS`}`**)?**
     member this.parseIfStatement() =
         let xRoot = XIfStatement()
-        this.SkipTo("expression")
-        this.NextLine()
         xRoot.IfCondition <- this.parseExpression()      
-        this.SkipTo("statements")
         xRoot.IfStatements <- this.parseStatements()
-        this.NextLine()
         this.NextLine() 
         if this.TagName() = "keyword" && this.TagValue() = "else" then
-            this.NextLine()
-            this.NextLine()
             xRoot.ElseStatements <- this.parseStatements()
-            this.NextLine()
-            this.NextLine() 
-        
-        this.NextLine() 
+             
+        this.SkipPast("/ifStatement")
         xRoot
         
 
     member this.parseWhileStatement() =
-        this.SkipPast("keyword")
         let xRoot = XWhileStatement()
         
         xRoot.Condition <- this.parseExpression()  
@@ -279,11 +271,10 @@ type XmlReader(filepath:string) =
         this.SkipPast("/whileStatement")
         xRoot
 
-    /// ``do`` ``subroutineName`` ``(`` ``expressionList`` ``)`` \
-    /// ``do`` ``objname`` ``.`` ``subroutineName`` ``(`` ``expressionList`` ``)``
+    /// `do` `subroutineName` `(`(EXPLIST)?`)` \
+    /// `do` `objName` `.` `subroutineName` `(`(EXPLIST)?`)`
     member this.parseDoStatement() =
         this.SkipPast("keyword")
-
         let identifier = this.TagValue()
         this.NextLine()
         let symbol = this.TagValue()
@@ -305,8 +296,9 @@ type XmlReader(filepath:string) =
         xRoot
 
 
+    /// `return` (EXPR)? `;`
     member this.parseReturnStatement() =
-        this.SkipPast("keyword") // skip: <returnStatement>
+        this.SkipPast("keyword") 
         let xRoot = XReturnStatement()
  
         if this.TagName() = "expression" then
@@ -316,10 +308,10 @@ type XmlReader(filepath:string) =
         xRoot
 
     
-    /// `EXPLIST` -> `EXP` (**,** `EXP`)* | **ε** \
+    /// EXPLIST -> EXP (`,` EXP)* | **ε** \
     /// \
-    /// **FIRST**(`EXPLIST`) = {**int**, **string**, **keyword**, **objName**, **(**, **unOp**, **ε**} \
-    /// **FOLLOW**(`EXPLIST`) = { **)** }
+    /// FIRST(EXPLIST) = {`int`, `string`, `keyword`, `objName`, `(`, `unOp`, **ε**} \
+    /// FOLLOW(EXPLIST) = {`)`}
     member this.parseExpressionList() =    
         this.SkipPast("expressionList")   
         let mutable xRoot = XExpression()
@@ -327,15 +319,19 @@ type XmlReader(filepath:string) =
         // line may be: </expressionList> or <expression>
         if _curLine = "<expression>" then
             xRoot <- this.parseExpression() 
+
+        while this.TagName() = "symbol" && this.TagValue() = "," do
+            XSubTerm("symbol", ",") |> xRoot.Add
+            this.parseExpression() |> xRoot.Add
             
         this.SkipPast("/expressionList")
         xRoot
         
 
-    /// `EXP` -> `TERM` (**op** `TERM`)* \
+    /// EXP -> TERM (`op` TERM)* \
     /// \
-    /// **FIRST**(`EXP`) = {**int**, **string**, **keyword**, **objName**, **(**, **unOp**} \
-    /// **FOLLOW**(`EXP`) = {**]**, **,**, **)**, ***$*** }
+    /// FIRST(EXP) = {`int`, `string`, `keyword`, `objName`, `(`, `unOp`} \
+    /// FOLLOW(EXP) = {`]`, `,`, `)`, **$**}
     member this.parseExpression() =
         this.SkipPast("expression")
          
@@ -344,7 +340,6 @@ type XmlReader(filepath:string) =
         
         while this.TagName() = "symbol" do
             XSubTerm("symbol", this.TagValue()) |> xRoot.Add
-            this.NextLine() // ?
             this.parseTerm() |> xRoot.Add  
                 
         this.SkipPast("/expression")
@@ -375,13 +370,15 @@ type XmlReader(filepath:string) =
                     this.parseExpressionList() |> xRoot.Add
                 | "(" ->
                     this.parseExpressionList() |> xRoot.Add
-                | _ -> ()
+                | _ -> failwith("Huh?")
+                if this.TagValue() <> ")" then 
+                    failwith("missing )")
                 XSubTerm("symbol", this.TagValue()) |> xRoot.Add // ')' or ']'
         | "symbol" -> 
             match this.TagValue() with
             | "("  ->
                 XSubTerm(tagName, "(") |> xRoot.Add
-                this.parseExpressionList() |> xRoot.Add
+                this.parseExpression() |> xRoot.Add
                 XSubTerm(this.TagName(), this.TagValue()) |> xRoot.Add // ')'
             | "-" | "~" ->
                 XSubTerm(tagName, this.TagValue()) |> xRoot.Add

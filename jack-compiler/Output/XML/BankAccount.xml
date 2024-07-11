@@ -1,0 +1,132 @@
+<class>
+    <keyword> class </keyword>
+    <identifier> BankAccount </identifier>
+    <symbol> { </symbol>
+    <classVarDec>
+        <keyword> static </keyword>
+        <keyword> int </keyword>
+        <identifier> nAccounts </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> static </keyword>
+        <keyword> int </keyword>
+        <identifier> bankCommission </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> field </keyword>
+        <keyword> int </keyword>
+        <identifier> id </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> field </keyword>
+        <identifier> String </identifier>
+        <identifier> owner </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <classVarDec>
+        <keyword> field </keyword>
+        <keyword> int </keyword>
+        <identifier> balance </identifier>
+        <symbol> ; </symbol>
+    </classVarDec>
+    <subroutineDec>
+        <keyword> method </keyword>
+        <keyword> int </keyword>
+        <identifier> commission </identifier>
+        <symbol> ( </symbol>
+        <parameterList>
+            <keyword> INT </keyword>
+            <identifier> x </identifier>
+        </parameterList>
+        <symbol> ) </symbol>
+        <subroutineBody>
+            <symbol> { </symbol>
+            <statements>
+            </statements>
+            <symbol> } </symbol>
+        </subroutineBody>
+    </subroutineDec>
+    <subroutineDec>
+        <keyword> method </keyword>
+        <keyword> void </keyword>
+        <identifier> transfer </identifier>
+        <symbol> ( </symbol>
+        <parameterList>
+            <keyword> INT </keyword>
+            <identifier> sum </identifier>
+            <symbol> , </symbol>
+            <identifier> BankAccount </identifier>
+            <identifier> from </identifier>
+            <symbol> , </symbol>
+            <identifier> Date </identifier>
+            <identifier> when </identifier>
+        </parameterList>
+        <symbol> ) </symbol>
+        <subroutineBody>
+            <symbol> { </symbol>
+            <varDec>
+                <keyword> var </keyword>
+                <keyword> INT </keyword>
+                <identifier> i </identifier>
+                <symbol> , </symbol>
+                <identifier> j </identifier>
+                <symbol> ; </symbol>
+            </varDec>
+            <varDec>
+                <keyword> var </keyword>
+                <identifier> Date </identifier>
+                <identifier> date </identifier>
+                <symbol> ; </symbol>
+            </varDec>
+            <statements>
+                <letStatement>
+                    <keyword> let </keyword>
+                    <identifier> balance </identifier>
+                    <symbol> = </symbol>
+                    <expression>
+                        <term>
+                            <symbol> ( </symbol>
+                            <expression>
+                                <term>
+                                    <identifier> balance </identifier>
+                                </term>
+                                <symbol> + </symbol>
+                                <term>
+                                    <identifier> sum </identifier>
+                                </term>
+                            </expression>
+                            <symbol> ) </symbol>
+                        </term>
+                        <symbol> - </symbol>
+                        <term>
+                            <identifier> commission </identifier>
+                            <symbol> ( </symbol>
+                            <expressionList>
+                                <expression>
+                                    <term>
+                                        <identifier> sum </identifier>
+                                    </term>
+                                    <symbol> * </symbol>
+                                    <term>
+                                        <integerConstant> 5 </integerConstant>
+                                    </term>
+                                </expression>
+                            </expressionList>
+                            <symbol> ) </symbol>
+                        </term>
+                    </expression>
+                    <symbol> ; </symbol>
+                </letStatement>
+                <returnStatement>
+                    <keyword> return </keyword>
+                    <symbol> ; </symbol>
+                </returnStatement>
+            </statements>
+            <symbol> } </symbol>
+        </subroutineBody>
+    </subroutineDec>
+    <symbol> } </symbol>
+</class>
